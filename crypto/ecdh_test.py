@@ -1,10 +1,10 @@
 import pyDHE
 
-alice = pyDHE.new()
+alice = pyDHE.new(group = 14)
 alicePubkey = alice.getPublicKey()
 print('Alice pub key:', alicePubkey)
 
-bob = pyDHE.new()
+bob = pyDHE.new(group = 14)
 bobPubkey = bob.getPublicKey()
 print('Bob pub key:', bobPubkey)
 
