@@ -8,14 +8,17 @@ print('AES encryption Key : ', binascii.hexlify(key))
 
 # Encrypt the plaintext with the given key
 #  ciphertext = AES-256-CTR-Encrypt(plaintext, key, iv)
-iv = secrets.randbits(256)
-plaintext = 'plain text'
-aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))
+# iv = secrets.randbits(256)
+iv = os.urandom(16)
+plaintext = 'plain text111111'
+# aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))
+aes = pyaes.AESModeOfOperationCBC(key, iv)
 ciphertext = aes.encrypt(plaintext)
 print('Ciphertext : ', binascii.hexlify(ciphertext))
 
 # Decrypt the ciphertext with the given key
 #  plaintext = AES-256-CTR-Decrypt(ciphertext, key, iv)
-aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))
+# aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))
+aes = pyaes.AESModeOfOperationCBC(key, iv)
 decryptedtext = aes.decrypt(ciphertext)
 print('Decrypted : ', decryptedtext)
