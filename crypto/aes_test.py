@@ -13,3 +13,9 @@ plaintext = 'plain text'
 aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))
 ciphertext = aes.encrypt(plaintext)
 print('Ciphertext : ', binascii.hexlify(ciphertext))
+
+# Decrypt the ciphertext with the given key
+#  plaintext = AES-256-CTR-Decrypt(ciphertext, key, iv)
+aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))
+decryptedtext = aes.decrypt(ciphertext)
+print('Decrypted : ', decryptedtext)
