@@ -62,9 +62,13 @@ def decrypt_ecc(encryptedMsg, privKey):
 msg = b'Text to be encrypted by ECC public key and ' \
       b'decrypted by its corresponding ECC private key'
 print("original msg:", msg)
+
+## step 1 : recepient create private/public key pair
+## export public key to the world
 privKey = secrets.randbelow(curve.field.n)
 pubKey = privKey * curve.g
 
+## step 2 : the sender in the world, encrypt with public key
 encryptedMsg = encrypt_ecc(msg, pubKey)
 encryptedMsgObj = {
     'ciphertext': binascii.hexlify(encryptedMsg[0]),
@@ -74,5 +78,6 @@ encryptedMsgObj = {
 }
 print("encrypted msg:", encryptedMsgObj)
 
+## step 3 : recepient decrypt with private key
 decryptedMsg = decrypt_ecc(encryptedMsg, privKey)
 print("decrypted msg:", decryptedMsg)
