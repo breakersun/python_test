@@ -1,16 +1,9 @@
 
 from tinyec import registry
-
+import secrets
 
 curve = registry.get_curve('secp192r1')
-print('Curve : ', curve)
-
-for k in range(0, 10):
-    p = k * curve.g
-    print(f'{k} * G = ({p.x}, {p.y})')
-
-print('Cofactor = ', curve.field.h)
-print('Cyclic group order = ', curve.field.n)
-
-nG = curve.field.n * curve.field.g
-# print(f'n * G = ({nG.x}, {nG.y})')
+privKey = secrets.randbelow(curve.field.n)
+pubKey = privKey * curve.g
+print('privateKey : ', privKey)
+print('pubKey : ', pubKey)
