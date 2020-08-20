@@ -66,5 +66,5 @@ def parseTimeAndVoltage(idx, history):
 
 rawHistory = dumpHistory()
 
-print(parseTimeAndVoltage(0x4178, rawHistory))
-print(parseTimeAndVoltage(0x4182, rawHistory))
+for idx in range(0x4178, 0x41da, 10):
+    print(parseTimeAndVoltage(idx, rawHistory))
