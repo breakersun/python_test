@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os
+import os, binascii
 
 def err_stop_with(output, errmsg):
     print("")
@@ -41,5 +41,30 @@ def dumpBdAddr():
     else:
         err_stop_with(output, "Dump the keyr file from device FAIL!")
 
+def parseTimeAndVoltage(idx, history):
+    gap = len('0x1234 - 0x')
+    startTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
+                                 rawHistory.find(hex(idx)) + gap + 4]
+    startTimeH = startTimeH[2:] + startTimeH[:2]  # switch high and low bytes
+    idx += 2
+    startTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
+                                 rawHistory.find(hex(idx)) + gap + 4]
+    startTimeL = startTimeL[2:] + startTimeL[:2]
+    idx += 2
+    endTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
+                                 rawHistory.find(hex(idx)) + gap + 4]
+    endTimeH = endTimeH[2:] + endTimeH[:2]
+    idx += 2
+    endTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
+                                 rawHistory.find(hex(idx)) + gap + 4]
+    endTimeL = endTimeL[2:] + endTimeL[:2]
+    idx += 2
+    vol = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
+                                 rawHistory.find(hex(idx)) + gap + 4]
+    return '0x' + startTimeH + startTimeL, '0x' + endTimeH + endTimeL, '0x' + vol
 
-print(dumpBdAddr())
+
+rawHistory = dumpHistory()
+
+print(parseTimeAndVoltage(0x4178, rawHistory))
+print(parseTimeAndVoltage(0x4182, rawHistory))
