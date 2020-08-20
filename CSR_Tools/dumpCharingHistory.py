@@ -59,10 +59,10 @@ def parseTimeAndVoltage(idx, history):
     endTimeL = endTimeL[2:] + endTimeL[:2]
     idx += 2
     vol = '' + history[history.find(hex(idx)) + gap : history.find(hex(idx)) + gap + 4]
-    return '0x' + startTimeH + startTimeL, '0x' + endTimeH + endTimeL, '0x' + vol
+    return startTimeH + startTimeL, endTimeH + endTimeL, vol
 
 
-def output():
+def outputDevice():
     rawHistory = dumpHistory()
     for idx in range(0x4178, 0x41da, 10):
         start_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[0], base=16)
@@ -74,6 +74,34 @@ def output():
               'Charging Finished at ' + datetime.datetime.fromtimestamp(finish_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
         print(hex(idx), 'Battery Level After Charging ', batt, '%')
 
+
+def outputFile(img_file):
+    lines = img_file.readlines()
+
+    for i in range(0, len(lines)):
+        if (lines[i].find('@004178') != -1):
+            starting = i
+            break
+
+    for i in range(0, 50, 5):
+        starting_epoch_sec_h = lines[starting + i][-3:-1] + lines[starting + i][-5:-3]
+        starting_epoch_sec_l = lines[starting + i + 1][-3:-1] + lines[starting + i][-5:-3]
+        ending_epoch_sec_h = lines[starting + i + 2][-3:-1] + lines[starting + i][-5:-3]
+        ending_epoch_sec_l = lines[starting + i + 3][-3:-1] + lines[starting + i][-5:-3]
+        batt = lines[starting + i + 4][-5:-1]
+
+        starting_epoch_sec = starting_epoch_sec_h + starting_epoch_sec_l
+        ending_epoch_sec = ending_epoch_sec_h + ending_epoch_sec_l
+        starting_epoch_sec = int(starting_epoch_sec, base=16)
+        ending_epoch_sec = int(ending_epoch_sec, base=16)
+        batt = int(batt, base=16)
+
+        print(lines[i + starting][0:7],
+              'Charging Started at ' + datetime.datetime.fromtimestamp(starting_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+        print(lines[i + starting][0:7],
+              'Charging Finished at ' + datetime.datetime.fromtimestamp(ending_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+        print(lines[i + starting][0:7], 'Battery Level After Charging ', batt, '%')
+
 try:
     arguments, values = getopt.getopt(sys.argv[1:], 'hdf:', ['help', 'device', 'file = '])
 
@@ -81,8 +109,11 @@ try:
         if curArgument in ('-h', '--help'):
             print('== help info ==')
         elif curArgument in ('-d', '--device'):
-            output()
+            outputDevice()
         elif curArgument in ('-f', '--file'):
             print('Image File : ', curValue)
+            with open(curValue, 'r') as dump_img:
+                outputFile(dump_img)
+                dump_img.close()
 except getopt.error as err:
     print(str(err))
