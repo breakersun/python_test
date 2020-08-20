@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import os, binascii
+import os, datetime
+
 
 def err_stop_with(output, errmsg):
     print("")
     print("ERROR: #############################################")
-    if(output != ""):
+    if (output != ""):
         print("ERROR: ################ OUT-MSG-BEG ################")
         print("ERROR: " + output)
         print("ERROR: ################ OUT-MSG-END ################")
@@ -15,6 +16,7 @@ def err_stop_with(output, errmsg):
     print("ERROR: #############################################")
     print("")
     exit(-1)
+
 
 def dumpHistory():
     print('Read Charging History ...')
@@ -41,30 +43,31 @@ def dumpBdAddr():
     else:
         err_stop_with(output, "Dump the keyr file from device FAIL!")
 
+
 def parseTimeAndVoltage(idx, history):
     gap = len('0x1234 - 0x')
-    startTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
-                                 rawHistory.find(hex(idx)) + gap + 4]
+    startTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
     startTimeH = startTimeH[2:] + startTimeH[:2]  # switch high and low bytes
     idx += 2
-    startTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
-                                 rawHistory.find(hex(idx)) + gap + 4]
+    startTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
     startTimeL = startTimeL[2:] + startTimeL[:2]
     idx += 2
-    endTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
-                                 rawHistory.find(hex(idx)) + gap + 4]
+    endTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
     endTimeH = endTimeH[2:] + endTimeH[:2]
     idx += 2
-    endTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
-                                 rawHistory.find(hex(idx)) + gap + 4]
+    endTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
     endTimeL = endTimeL[2:] + endTimeL[:2]
     idx += 2
-    vol = '' + rawHistory[rawHistory.find(hex(idx)) + gap:
-                                 rawHistory.find(hex(idx)) + gap + 4]
+    vol = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
     return '0x' + startTimeH + startTimeL, '0x' + endTimeH + endTimeL, '0x' + vol
 
 
 rawHistory = dumpHistory()
 
 for idx in range(0x4178, 0x41da, 10):
-    print(parseTimeAndVoltage(idx, rawHistory))
+    start_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[0], base=16)
+    finish_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[1], base=16)
+    batt = int(parseTimeAndVoltage(idx, rawHistory)[2], base=16)
+    print(hex(idx), 'Charging Started at ' + datetime.datetime.fromtimestamp(start_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+    print(hex(idx), 'Charging Finished at ' + datetime.datetime.fromtimestamp(finish_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+    print(hex(idx), 'Battery Level After Charging ', batt, '%')
