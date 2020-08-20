@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, datetime
+import os, datetime, getopt, sys
 
 
 def err_stop_with(output, errmsg):
@@ -46,28 +46,43 @@ def dumpBdAddr():
 
 def parseTimeAndVoltage(idx, history):
     gap = len('0x1234 - 0x')
-    startTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
+    startTimeH = '' + history[history.find(hex(idx)) + gap : history.find(hex(idx)) + gap + 4]
     startTimeH = startTimeH[2:] + startTimeH[:2]  # switch high and low bytes
     idx += 2
-    startTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
+    startTimeL = '' + history[history.find(hex(idx)) + gap : history.find(hex(idx)) + gap + 4]
     startTimeL = startTimeL[2:] + startTimeL[:2]
     idx += 2
-    endTimeH = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
+    endTimeH = '' + history[history.find(hex(idx)) + gap : history.find(hex(idx)) + gap + 4]
     endTimeH = endTimeH[2:] + endTimeH[:2]
     idx += 2
-    endTimeL = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
+    endTimeL = '' + history[history.find(hex(idx)) + gap : history.find(hex(idx)) + gap + 4]
     endTimeL = endTimeL[2:] + endTimeL[:2]
     idx += 2
-    vol = '' + rawHistory[rawHistory.find(hex(idx)) + gap : rawHistory.find(hex(idx)) + gap + 4]
+    vol = '' + history[history.find(hex(idx)) + gap : history.find(hex(idx)) + gap + 4]
     return '0x' + startTimeH + startTimeL, '0x' + endTimeH + endTimeL, '0x' + vol
 
 
-rawHistory = dumpHistory()
+def output():
+    rawHistory = dumpHistory()
+    for idx in range(0x4178, 0x41da, 10):
+        start_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[0], base=16)
+        finish_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[1], base=16)
+        batt = int(parseTimeAndVoltage(idx, rawHistory)[2], base=16)
+        print(hex(idx),
+              'Charging Started at ' + datetime.datetime.fromtimestamp(start_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+        print(hex(idx),
+              'Charging Finished at ' + datetime.datetime.fromtimestamp(finish_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+        print(hex(idx), 'Battery Level After Charging ', batt, '%')
 
-for idx in range(0x4178, 0x41da, 10):
-    start_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[0], base=16)
-    finish_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[1], base=16)
-    batt = int(parseTimeAndVoltage(idx, rawHistory)[2], base=16)
-    print(hex(idx), 'Charging Started at ' + datetime.datetime.fromtimestamp(start_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
-    print(hex(idx), 'Charging Finished at ' + datetime.datetime.fromtimestamp(finish_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
-    print(hex(idx), 'Battery Level After Charging ', batt, '%')
+try:
+    arguments, values = getopt.getopt(sys.argv[1:], 'hdf:', ['help', 'device', 'file = '])
+
+    for curArgument, curValue in arguments:
+        if curArgument in ('-h', '--help'):
+            print('== help info ==')
+        elif curArgument in ('-d', '--device'):
+            output()
+        elif curArgument in ('-f', '--file'):
+            print('Image File : ', curValue)
+except getopt.error as err:
+    print(str(err))
