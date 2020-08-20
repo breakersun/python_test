@@ -108,6 +108,8 @@ try:
     for curArgument, curValue in arguments:
         if curArgument in ('-h', '--help'):
             print('== help info ==')
+            print('-d : Read from Device Directly')
+            print('-f dump.img : Read from dump image file')
         elif curArgument in ('-d', '--device'):
             outputDevice()
         elif curArgument in ('-f', '--file'):
