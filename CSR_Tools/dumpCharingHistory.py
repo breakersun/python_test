@@ -68,10 +68,8 @@ def outputDevice():
         start_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[0], base=16)
         finish_epoch_sec = int(parseTimeAndVoltage(idx, rawHistory)[1], base=16)
         batt = int(parseTimeAndVoltage(idx, rawHistory)[2], base=16)
-        print(hex(idx),
-              'Charging Started at ' + datetime.datetime.fromtimestamp(start_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
-        print(hex(idx),
-              'Charging Finished at ' + datetime.datetime.fromtimestamp(finish_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+        print(hex(idx), 'Charging Started at ' + datetime.datetime.fromtimestamp(start_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
+        print(hex(idx), 'Charging Finished at ' + datetime.datetime.fromtimestamp(finish_epoch_sec).strftime('%m/%d/%Y %H:%M:%S'))
         print(hex(idx), 'Battery Level After Charging ', batt, '%')
 
 
